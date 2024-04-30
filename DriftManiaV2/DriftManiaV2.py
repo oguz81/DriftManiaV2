@@ -16,7 +16,7 @@ pygame.display.set_caption("DriftMania")
 # Menu
 menu_options = ["START", "HOW TO PLAY", "ABOUT"]
 selected_option = 0
-menu_background_load = pygame.image.load("menubackground.png")
+menu_background_load = pygame.image.load("menubackground2.png")
 menu_background = pygame.transform.scale(menu_background_load, (menu_background_load.get_width(), menu_background_load.get_height()))
 
 # Define colors and font for the menu
@@ -60,6 +60,7 @@ class Barrier:
         new_rect = rotated_image.get_rect(center = the_barrier.get_rect(center = (self.posx, self.posy)).center)
         return rotated_image, new_rect
     
+
 # Define the barriers
 barrier1 = Barrier(700, 12, 1300, 5, 0)
 barrier1_draw, barrier1_rect = barrier1.rotate()
@@ -79,13 +80,13 @@ barrier8 = Barrier(371, 354, 20, 20, 0)
 barrier8_draw, barrier8_rect = barrier8.rotate()
 barrier9 = Barrier(1100, 217, 10, 10, 0)
 barrier9_draw, barrier9_rect = barrier9.rotate()
-barrier10 = Barrier(735, 250, 10, 10, 0)
+barrier10 = Barrier(735, 235, 10, 10, 0)
 barrier10_draw, barrier10_rect = barrier10.rotate()
-barrier11 = Barrier(900, 250, 10, 10, 0)
+barrier11 = Barrier(900, 235, 10, 10, 0)
 barrier11_draw, barrier11_rect = barrier11.rotate()
-barrier12 = Barrier(900, 340, 10, 10, 0)
+barrier12 = Barrier(900, 355, 10, 10, 0)
 barrier12_draw, barrier12_rect = barrier12.rotate()
-barrier13 = Barrier(735, 340, 10, 10, 0)
+barrier13 = Barrier(735, 355, 10, 10, 0)
 barrier13_draw, barrier13_rect = barrier13.rotate()
 barrier14 = Barrier(1010, 500, 10, 10, 0)
 barrier14_draw, barrier14_rect = barrier14.rotate()
@@ -93,7 +94,8 @@ barrier14_draw, barrier14_rect = barrier14.rotate()
 # Score
 score = 0
 score_font = pygame.font.SysFont("Arial", 36, italic = True)
-
+score_file = open("score.txt", "w+")
+best_score = 0
 # Car specs
 car_speed = 0
 acceleration = 0.05
@@ -107,6 +109,7 @@ drift = 0
 # Load the car image
 car_image_load = pygame.image.load("car.png")
 car_image = pygame.transform.scale(car_image_load, (car_image_load.get_width() / 10, car_image_load.get_height() / 10))
+
 # Initialize the car position
 car_x = screen_width / 2 - car_image.get_width() / 2
 car_y = screen_height / 2 - car_image.get_height()
@@ -125,6 +128,9 @@ def rot_center(image, direction, x, y):
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
+            print(best_score)
+            score_file.write(str(best_score))
+        
             pygame.quit()
             sys.exit()
             
@@ -143,10 +149,10 @@ while True:
             elif event.key == pygame.K_ESCAPE and state != "game":
                 state = "menu"
     if state == "menu":
-        screen.blit(menu_background, (0,0))
+        screen.blit(menu_background, (-100,0))
         for i, option in enumerate(menu_options):
             text = font.render(option, True, RED if i == selected_option else BLACK)
-            text_rect = text.get_rect(center=(1200, 250 + i * 50))
+            text_rect = text.get_rect(center=(1100, 350 + i * 50))
             screen.blit(text, text_rect)
     elif state == "game":
         keys = pygame.key.get_pressed()
@@ -238,13 +244,17 @@ while True:
             car_speed += -2
         if barrier14_rect.colliderect(car_rect):
             car_speed += -2
-        
+     
         # Score
-        if car_speed > 2:
-            if abs(angle - direction) > 2 or (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+        #if car_speed > 2:
+        if abs(angle - direction) > 20 or (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
+            if car_speed > 2:
                 score += 1
         else:
             score = 0
+        if score > best_score:
+            best_score = score
+        
         # Clear the screen
         screen.fill((255,255,255))
 
@@ -252,6 +262,7 @@ while True:
         screen.blit(track, (0,0))
         # Draw the car
         screen.blit(car_image_rotation, car_rect)
+       
         # Draw the barriers
         screen.blit(barrier1_draw, barrier1_rect)
         screen.blit(barrier2_draw, barrier2_rect)
@@ -267,10 +278,12 @@ while True:
         screen.blit(barrier12_draw, barrier12_rect)
         screen.blit(barrier13_draw, barrier13_rect)
         screen.blit(barrier14_draw, barrier14_rect)
-        
+       
         # Draw the score
-        score_surface = score_font.render("Score: " + str(score), True, (255, 255, 255), (0,0,0))
+        score_surface = score_font.render("Score: " + str(score), True, (255, 255, 255), (252,110,8))
         screen.blit(score_surface, (10, 10))
+        best_score_surface = score_font.render("Best: " + str(best_score), True, (255, 255, 255), (252,110,8))
+        screen.blit(best_score_surface, (10, 50))
     elif state == "howto":
         screen.blit(how_to_background, (0,0))
         screen.blit(how_to_text, (100, 300))
@@ -286,5 +299,5 @@ while True:
     pygame.display.flip()
     # Limit the frame rate
     pygame.time.Clock().tick(60)
-
+    
 pygame.quit()
