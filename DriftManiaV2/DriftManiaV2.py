@@ -30,7 +30,7 @@ state = "menu"
 how_to = pygame.font.SysFont("Arial", 24, italic = True, bold = True)
 how_to_text = how_to.render("Use arrow keys to drive.", True, BLACK, (0,255,0))
 how_to_text2 = how_to.render("Try to do the highest drift score.", True, BLACK, (0,255,0))
-how_to_text3 = how_to.render("If you slow down, leave the drift or hit the barriers your score turns to zero.", True, BLACK, (0,255,0))
+how_to_text3 = how_to.render("If you slow down, leave the drift or hit the yellow barriers your score turns to zero.", True, BLACK, (0,255,0))
 how_to_background_load = pygame.image.load("howtobackground.png")
 how_to_background = pygame.transform.scale(how_to_background_load, (how_to_background_load.get_width() * 0.8, how_to_background_load.get_height() * 0.8))
 
@@ -39,7 +39,7 @@ about = pygame.font.SysFont("Arial", 20, italic = True, bold = True)
 about_text = about.render("DriftMania was developed with Python.", True, BLACK)
 about_text2 = about.render("Once upon a time, Oguz Demirtas was bored and wanted to do something to have fun.", True, BLACK)
 about_text3 = about.render("And DriftMania was born.", True, BLACK)
-about_text4 = about.render("github.com/oguz81/driftmania", True, BLACK)
+about_text4 = about.render("github.com/oguz81/DriftManiaV2", True, BLACK)
 about_background_load = pygame.image.load("aboutbackground.png")
 about_background = pygame.transform.scale(about_background_load, (about_background_load.get_width(), about_background_load.get_height()))
 
@@ -94,7 +94,6 @@ barrier14_draw, barrier14_rect = barrier14.rotate()
 # Score
 score = 0
 score_font = pygame.font.SysFont("Arial", 36, italic = True)
-score_file = open("score.txt", "w+")
 best_score = 0
 # Car specs
 car_speed = 0
@@ -128,9 +127,6 @@ def rot_center(image, direction, x, y):
 while True:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            print(best_score)
-            score_file.write(str(best_score))
-        
             pygame.quit()
             sys.exit()
             
@@ -146,7 +142,7 @@ while True:
                     state = "howto"
                 elif selected_option == 2:
                     state = "about"
-            elif event.key == pygame.K_ESCAPE and state != "game":
+            elif event.key == pygame.K_ESCAPE: #and state != "game":
                 state = "menu"
     if state == "menu":
         screen.blit(menu_background, (-100,0))
@@ -246,7 +242,6 @@ while True:
             car_speed += -2
      
         # Score
-        #if car_speed > 2:
         if abs(angle - direction) > 20 or (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT]):
             if car_speed > 2:
                 score += 1
